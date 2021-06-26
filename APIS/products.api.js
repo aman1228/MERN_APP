@@ -74,7 +74,7 @@ productApi.post("/createproducts",multerObj.single("photo"),(async(req, res)=>{
 
             let newProduct= JSON.parse(req.body.productObj);
 
-           let product = await productcollectionObj.findOne({ modelNo: newProduct.modelNo})
+           let product = await productcollectionObj.findOne({ productname: newProduct.productname})
 
 
                         if(product !== null){

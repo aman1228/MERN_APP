@@ -5,7 +5,9 @@ const bcryptjs = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const expressErrorHandler = require("express-async-handler")
 const multerObj = require("./middlewares/addfile")
-const checkToken= require("./middlewares/verifyToken")
+const checkToken= require("./middlewares/verifyToken");
+const { response } = require("express");
+require("dotenv").config()
 
 
 
@@ -16,6 +18,15 @@ userApi.get("/getusers",expressErrorHandler( async  (req,res, next )=>{
 
       let userList= await usercollectionObj.find().toArray();
       res.send({message: userList})
+}))
+
+userApi.get("/getcartproducts/:username",expressErrorHandler( async  (req,res, next )=>{
+
+   let usercartcollectionObj = req.app.get("usercartcollectionObj")
+   let un = req.params.username
+
+      let list= await usercartcollectionObj.find({username:un}).toArray();
+      res.send({message: list})
 }))
 
 
@@ -50,8 +61,8 @@ userApi.post("/createusers",multerObj.single('photo'),expressErrorHandler(async(
         res.send({message:"user allready existed"})
     }
     else{
-        let hashedPassword=await bcryptjs.hash(newUser.password,7)
-        newUser.password=hashedPassword;
+       let hashedPassword=await bcryptjs.hash(newUser.password,9)
+       newUser.password=hashedPassword;
         newUser.ProfileImage=req.file.path;
 
 
@@ -119,7 +130,7 @@ else{
    }
 
    else{
-      let token= await jwt.sign({username: credentials.username}, "ababa",{expiresIn:120})
+      let token= await jwt.sign({username: credentials.username}, process.env.SECRET ,{expiresIn:120})
 
       delete(user.password)
       res.send({message: "login-successfull", 
@@ -130,6 +141,36 @@ else{
    )
    }
 }
+}))
+
+userApi.post("/addtocart",expressErrorHandler(async(req, res, next)=>{
+
+let  usercartcollectionObj = req.app.get("usercartcollectionObj")
+
+let usercartObj = req.body;
+//console.log("usercart is ",usercartObj)
+let  userInCart = await usercartcollectionObj.findOne({username: usercartObj.username})
+
+if(userInCart === null){
+
+   let products=[];  
+   products.push(usercartObj.productObj)
+
+   let newUserCartObj = {username: usercartObj.username, products:products};
+
+   console.log(newUserCartObj)
+   
+   await usercartcollectionObj.insertOne(newUserCartObj)
+   res.send({message: "product added to cart"})
+}
+else{
+   userInCart.products.push(usercartObj.productObj)
+   //update
+   await usercartcollectionObj.updateOne({username:usercartObj.username},{$set:{...userInCart}})
+   res.send({message:"product addeded to cart"})
+
+}
+
 }))
 
 userApi.get("/testing", checkToken,expressErrorHandler((req, res)=>{

@@ -86,11 +86,13 @@ const handlelogout=()=>{
 
             <Route path="/userprofile/:username">
                 <Userprofile />
+             
 
             </Route>
 
             <Route path="/adminprofile/:username">
                 <AdminProfile />
+           
 
             </Route>
 

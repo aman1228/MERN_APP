@@ -5,49 +5,57 @@ import { useHistory } from "react-router-dom";
 
 function Login(props){
 
-            let {register ,handleSubmit,formState:{errors}}= useForm();
-            const history = useHistory();
+    let {register ,handleSubmit,formState:{errors}}= useForm();
+    const history = useHistory();
 
-            const onFormsubmit = (credentials)=> {
-                console.log(credentials)
-           
-                        //console.log(userObj)
-                        axios.post(`${credentials.type}/login`,credentials)
-                        .then(res=>{
-                            let resObj = res.data;
-                            if(resObj.message ==="login-successfull"){
-                                // token to be saved to local storage
-                                localStorage.setItem("token",resObj.token)
-                                localStorage.setItem("user",JSON.stringify(resObj.userObj))
-                                props.setUserLoginStatus(true)
-                                if(credentials.type=== "user"){    
-                                       //navigate to the usercomponent
-                                    history.push(`/userprofile/${resObj.username}`)
-                                }
+    const onFormsubmit = (credentials)=> {
 
-                                if(credentials.type=== "admin"){    
-                                    //navigate to the usercomponent
-                                 history.push(`/adminprofile/${resObj.username}`)
-                             }
-                         
-                            }
-                            else{
-                                alert(resObj.message)
-                            }
-                            
-                        })
-                        .catch(err=>{
-                            console.log(err)
-                            alert("something went wrong")
-                        })
-                 
+
+        //console.log(userObj)
+        axios.post(`${credentials.type}/login`,credentials)
+        .then(res=>{
+            let resObj = res.data;
+            if(resObj.message ==="login-successfull"){
+                // token to be saved to local storage
+                localStorage.setItem("token",resObj.token)
+
+                localStorage.setItem("user",JSON.stringify(resObj.userObj))
+
+                localStorage.setItem("username",resObj.username)
+                
+                localStorage.setItem("usertyp",credentials.type)
+
+                props.setUserLoginStatus(true)
+                if(credentials.type=== "user"){    
+                        //navigate to the usercomponent
+                    history.push(`/userprofile/${resObj.username}`)
+
                 }
 
+                if(credentials.type=== "admin"){    
+                    //navigate to the usercomponent
+                    history.push(`/adminprofile/${resObj.username}`)
+    
+                }
+            
+            }
+            else{
+                alert(resObj.message)
+            }
+            
+        })
+        .catch(err=>{
+            console.log(err)
+            alert("something went wrong")
+        })
+    
+}
+
             return(
-                        <form className="w-50 mx-auto " onSubmit={handleSubmit(onFormsubmit)}>
-                            <div>
-                                <h2>Login</h2>
-                            </div>
+    <form className="w-50 mx-auto " onSubmit={handleSubmit(onFormsubmit)}>
+        <div>
+            <h2>Login</h2>
+        </div>
         <div className="mb-3">
         <input type="radio" 
          id="admin" 
@@ -62,12 +70,11 @@ function Login(props){
                 value="user"
          {...register("type")} 
          className="form-check-input mt-5">
-               </input>
-             <label className="form-check-label  mt-5" for=" user">User</label>
+            </input>
+            <label className="form-check-label  mt-5" for=" user">User</label>
         </div>
 
       
-   
          <input type="text" 
          id="un" 
          placeholder="username"
@@ -85,13 +92,9 @@ function Login(props){
          </input>
 
 
-         <button type="submit"  className="btn btn-primary mt-3  me-2">Submit</button>
+         <button type="submit"  className="btn btn-primary mt-3  me-2">Login</button>
 
-
-
-
-
-                     </form>
+      </form>
             )
 }
 

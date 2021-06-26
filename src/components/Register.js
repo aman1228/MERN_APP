@@ -93,7 +93,7 @@ function Register(){
                     className="form-control mb-3" 
                     onChange={(e)=>{onFileSelect(e)}}/> 
 
-                        <button type="submit"  className="btn btn-primary mt-3  me-2">Submit</button>
+                        <button type="submit"  className="btn btn-primary mt-3  me-2">Register</button>
 
 
 

@@ -2,6 +2,7 @@ const exp = require ("express")
 const app  = exp();
 const path = require("path")
 
+require("dotenv").config()
 
 app.use(exp.static(path.join(__dirname,"./build/")))
 const userApi = require("./APIS/user-api")
@@ -17,8 +18,7 @@ const mongoClient = require("mongodb").MongoClient;
 
 //db connection
 
-const dburl = "mongodb+srv://amansaxena2899:amansaxena28@cluster0.ikqc9.mongodb.net/amansaxena2899db?retryWrites=true&w=majority"
-
+const dburl = process.env.DATABASE_URL
 let databaseObj;
 
 // connect 
@@ -32,11 +32,14 @@ mongoClient.connect(dburl,{useNewUrlParser:true, useUnifiedTopology:true},(err, 
                         //user collection object
                       let  usercollectionObj = databaseObj.collection("usercollection")
                       let  admincollectionObj = databaseObj.collection("admincollection")
-                        let   productcollectionObj = databaseObj.collection("productcoll")
+                      let   productcollectionObj = databaseObj.collection("productcoll")
+                      let   usercartcollectionObj = databaseObj.collection("usercartcollection")
+                      
 
                         app.set("usercollectionObj",usercollectionObj)
                         app.set("admincollectionObj",admincollectionObj)
                         app.set("productcollectionObj",productcollectionObj)
+                        app.set("usercartcollectionObj",usercartcollectionObj)
 
                         console.log("db  connected")
 
@@ -73,5 +76,5 @@ app.use((err,req, res, next)=>{
             console.log(err)
             res.send({message : err.message})
 })
-const port=8080
+const port=process.env.PORT||8080;
 app.listen(port, ()=>console.log(`server is listening on port `))
